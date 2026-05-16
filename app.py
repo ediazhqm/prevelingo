@@ -1,96 +1,131 @@
 import streamlit as st
 import time
 
-# --- 1. CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="HSEQ Academy 4.0", page_icon="👷‍♂️", layout="centered")
 
-# --- 2. GESTIÓN DEL ESTADO (Memoria del juego) ---
-# Aquí guardamos los puntos y vidas del trabajador mientras navega
+# --- 1. GESTIÓN DEL ESTADO (Memoria del juego) ---
 if 'puntos' not in st.session_state:
     st.session_state.puntos = 0
 if 'vidas' not in st.session_state:
     st.session_state.vidas = 3
 if 'pregunta_actual' not in st.session_state:
     st.session_state.pregunta_actual = 0
+if 'nivel_actual' not in st.session_state:
+    st.session_state.nivel_actual = 1
+if 'nivel_2_desbloqueado' not in st.session_state:
+    st.session_state.nivel_2_desbloqueado = False
 
-# --- 3. BARRA LATERAL (Perfil y Progreso) ---
+# --- 2. BARRA LATERAL (Perfil y Progreso) ---
 with st.sidebar:
     st.title("🧑‍🔧 Tu Perfil")
-    st.subheader(f"Puntos Totales: 🏆 {st.session_state.puntos}")
+    st.subheader(f"Puntos: 🏆 {st.session_state.puntos}")
     st.subheader(f"Vidas: {'❤️' * st.session_state.vidas}{'🖤' * (3 - st.session_state.vidas)}")
     
     st.divider()
     st.markdown("**Árbol de Habilidades**")
-    st.button("🔓 Nivel 1: Fundamentos", use_container_width=True, type="primary")
-    st.button("🔒 Nivel 2: Operaciones", use_container_width=True, disabled=True)
-    st.button("🔒 Nivel 3: Resp. Emergencias", use_container_width=True, disabled=True)
+    
+    # Botones de navegación en el menú lateral
+    if st.button("🔓 Nivel 1: Fundamentos", use_container_width=True, type="primary" if st.session_state.nivel_actual == 1 else "secondary"):
+        st.session_state.nivel_actual = 1
+        st.session_state.pregunta_actual = 0
+        st.rerun()
+        
+    if st.button("🔓 Nivel 2: Operaciones Críticas" if st.session_state.nivel_2_desbloqueado else "🔒 Nivel 2: Bloqueado", 
+                 use_container_width=True, 
+                 disabled=not st.session_state.nivel_2_desbloqueado,
+                 type="primary" if st.session_state.nivel_actual == 2 else "secondary"):
+        st.session_state.nivel_actual = 2
+        st.session_state.pregunta_actual = 0
+        st.rerun()
 
-# --- 4. CONTENIDO PRINCIPAL: MÓDULO 1.1 ---
-st.title("Nivel 1: Identificando al Enemigo 🎯")
-st.markdown("Bienvenido al módulo básico. En terreno, confundir un **Peligro** con un **Riesgo** puede ser fatal. Demuestra que sabes la diferencia.")
-
-# Base de datos de preguntas (Diccionario de Python)
-preguntas = [
+# --- 3. BASE DE DATOS DE PREGUNTAS (Por Niveles) ---
+preguntas_n1 = [
     {
-        "escenario": "Camión de acarreo con fallas en el sistema de frenos operando en rampa.",
+        "escenario": "Camión de acarreo con fallas en el sistema de frenos.",
         "opciones": ["Es un Peligro", "Es un Riesgo"],
-        "respuesta_correcta": "Es un Peligro",
-        "explicacion": "El camión con fallas es la **fuente o situación** con potencial de daño (Peligro)."
+        "correcta": "Es un Peligro",
+        "explicacion": "El camión con fallas es la fuente con potencial de daño."
     },
     {
-        "escenario": "Volcadura del camión durante la bajada y lesión grave del operador.",
+        "escenario": "Volcadura del camión y lesión grave del operador.",
         "opciones": ["Es un Peligro", "Es un Riesgo"],
-        "respuesta_correcta": "Es un Riesgo",
-        "explicacion": "La volcadura y lesión son la **probabilidad + consecuencia** de que el peligro se materialice (Riesgo)."
-    },
-    {
-        "escenario": "Ruido de 95 dB en la zona de chancado primario.",
-        "opciones": ["Es un Peligro", "Es un Riesgo"],
-        "respuesta_correcta": "Es un Peligro",
-        "explicacion": "El ruido es el agente físico presente en el ambiente (Peligro)."
+        "correcta": "Es un Riesgo",
+        "explicacion": "Es la probabilidad + consecuencia de que el peligro se materialice."
     }
 ]
 
-# Lógica de fin de juego
+preguntas_n2 = [
+    {
+        "escenario": "Paso 1 del procedimiento LOTO (Aislamiento y Bloqueo de Energía):",
+        "opciones": ["Apagar el equipo", "Preparación y Aviso"],
+        "correcta": "Preparación y Aviso",
+        "explicacion": "Antes de tocar el interruptor, debes conocer el tipo de energía y avisar a todo el personal afectado."
+    }
+]
+
+# Seleccionar qué preguntas mostrar según el nivel actual
+preguntas = preguntas_n1 if st.session_state.nivel_actual == 1 else preguntas_n2
+
+# --- 4. LÓGICA DEL JUEGO ---
 if st.session_state.vidas <= 0:
-    st.error("💀 ¡Te quedaste sin vidas! Un error en campo no perdona. Repasa la matriz IPERC y vuelve a intentarlo.")
-    if st.button("Reiniciar Módulo"):
+    st.error("💀 ¡Te quedaste sin vidas! Un error en campo no perdona.")
+    if st.button("Reiniciar Capacitación"):
         st.session_state.vidas = 3
         st.session_state.puntos = 0
         st.session_state.pregunta_actual = 0
+        st.session_state.nivel_actual = 1
         st.rerun()
 
 elif st.session_state.pregunta_actual >= len(preguntas):
-    st.success(f"🎉 ¡Módulo completado! Excelente trabajo. Puntos finales: {st.session_state.puntos}")
+    st.success(f"🎉 ¡Nivel {st.session_state.nivel_actual} completado con éxito!")
     st.balloons()
-    if st.button("Volver a jugar"):
-        st.session_state.pregunta_actual = 0
-        st.rerun()
+    
+    # Lógica de transición de niveles
+    if st.session_state.nivel_actual == 1:
+        st.session_state.nivel_2_desbloqueado = True
+        st.info("🔓 ¡Has desbloqueado el Nivel 2!")
+        if st.button("🚀 Iniciar Nivel 2", type="primary"):
+            st.session_state.nivel_actual = 2
+            st.session_state.pregunta_actual = 0
+            st.rerun()
+    else:
+        st.write("¡Felicidades! Has completado todo el entrenamiento disponible por ahora.")
 
-# Lógica del cuestionario interactivo
 else:
+    st.title(f"Nivel {st.session_state.nivel_actual} 🎯")
     q = preguntas[st.session_state.pregunta_actual]
     
     st.info(f"**Escenario {st.session_state.pregunta_actual + 1}:** {q['escenario']}")
     
-    # Formulario para evitar recargas hasta que el usuario confirme
-    with st.form(key=f"form_{st.session_state.pregunta_actual}"):
-        respuesta_usuario = st.radio("¿Qué representa esta condición?", q['opciones'], index=None)
-        submit_button = st.form_submit_button(label="Comprobar Respuesta")
+    # DISEÑO FLUIDO: Usamos columnas para colocar los botones uno al lado del otro
+    col1, col2 = st.columns(2)
+    
+    # Este espacio vacío sirve para mostrar el mensaje de acierto/error sin descuadrar la pantalla
+    espacio_mensaje = st.empty()
+    
+    opcion_elegida = None
+    
+    with col1:
+        if st.button(q['opciones'][0], use_container_width=True):
+            opcion_elegida = q['opciones'][0]
+    with col2:
+        if st.button(q['opciones'][1], use_container_width=True):
+            opcion_elegida = q['opciones'][1]
 
-    if submit_button:
-        if respuesta_usuario == None:
-            st.warning("⚠️ Selecciona una opción antes de comprobar.")
-        elif respuesta_usuario == q['respuesta_correcta']:
-            st.success("✅ ¡Correcto! +10 puntos.")
-            st.caption(f"💡 *Nota técnica:* {q['explicacion']}")
+    # Evaluación instantánea
+    if opcion_elegida:
+        if opcion_elegida == q['correcta']:
+            espacio_mensaje.success(f"✅ ¡Correcto! +10 pts. \n\n*Nota:* {q['explicacion']}")
             st.session_state.puntos += 10
-            st.session_state.pregunta_actual += 1
-            time.sleep(2) # Pausa dramática breve
-            st.rerun() # Recarga la app para mostrar la siguiente pregunta
         else:
-            st.error("❌ Incorrecto. Pierdes una vida.")
-            st.caption(f"💡 *Corrección:* {q['explicacion']}")
+            espacio_mensaje.error(f"❌ Incorrecto. Pierdes una vida. \n\n*Corrección:* {q['explicacion']}")
             st.session_state.vidas -= 1
-            time.sleep(2)
-            st.rerun()
+            
+        # Avanzamos la pregunta internamente
+        st.session_state.pregunta_actual += 1
+        
+        # Hacemos una pausa para que el trabajador pueda leer la explicación antes de pasar
+        time.sleep(2.5) 
+        
+        # Forzamos la recarga de la pantalla con la nueva pregunta
+        st.rerun()
