@@ -9,7 +9,7 @@ if 'idx' not in st.session_state: st.session_state.idx = 0
 if 'vidas' not in st.session_state: st.session_state.vidas = 3
 if 'esferas' not in st.session_state: st.session_state.esferas = []
 
-# --- 2. BASE DE DATOS ---
+# --- 2. BASE DE DATOS (Teoría del PDF integrada) ---
 preguntas = [
     {"pregunta": "¿Qué caracteriza la labor de un auditor según la normativa?", "opciones": ["Es independiente e íntegra", "Busca sancionar al personal", "Es una actividad administrativa"], "correcta": "Es independiente e íntegra"},
     {"pregunta": "¿Qué resulta al comparar una evidencia contra un criterio?", "opciones": ["Un Hallazgo / No Conformidad", "Una sanción económica", "Un reporte de gastos"], "correcta": "Un Hallazgo / No Conformidad"},
@@ -27,13 +27,22 @@ st.title("🐉 HSEQ Academy: Camino a Shenlong")
 st.sidebar.subheader(f"Esferas: {' '.join(st.session_state.esferas)}")
 st.sidebar.write(f"Vidas: {'❤️' * st.session_state.vidas}")
 
-# --- PANTALLA DE VICTORIA (Prioridad máxima) ---
+# --- PANTALLA DE VICTORIA ---
 if st.session_state.idx >= len(preguntas):
     st.balloons()
     st.success("¡FELICIDADES! Has reunido las 3 esferas.")
-    # Usamos un contenedor para asegurar que la imagen se renderice
-    st.image("https://media.giphy.com/media/l41lTjJp8whYyG2uQ/giphy.gif", caption="¡Shenlong ha aparecido!")
-    st.header("Has completado el entrenamiento de Seguridad 4.0")
+    
+    # Representación visual de Shenlong usando texto y emojis (100% visible)
+    st.markdown("""
+    ### ¡SHENLONG HA APARECIDO! 🐉✨
+    
+    # 🐉🐉🐉🐉🐉🐉
+    # 🐉   🔥🐲🔥   🐉
+    # 🐉   ✨✨✨   🐉
+    # 🐉🐉🐉🐉🐉🐉
+    
+    Tu conocimiento en Auditoría, Fiscalización e Inspección es nivel experto.
+    """)
     
     if st.button("Reiniciar camino"):
         st.session_state.idx = 0
@@ -45,7 +54,7 @@ if st.session_state.idx >= len(preguntas):
 else:
     q = preguntas[st.session_state.idx]
     
-    # Barajar opciones solo al entrar a la pregunta
+    # Barajar opciones al cargar la pregunta
     if f"ops_{st.session_state.idx}" not in st.session_state:
         opts = q['opciones'][:]
         random.shuffle(opts)
@@ -59,6 +68,7 @@ else:
     if st.button("Validar Respuesta"):
         if opcion == q['correcta']:
             st.success("✅ ¡Correcto!")
+            # Ganar esfera cada 3 preguntas (Auditoría, Fiscalización, Inspecciones)
             if (st.session_state.idx + 1) % 3 == 0:
                 st.session_state.esferas.append("🟠")
             st.session_state.idx += 1
