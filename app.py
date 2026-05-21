@@ -23,7 +23,7 @@ preguntas = [
 ]
 
 # --- 3. LÓGICA DE INTERFAZ ---
-st.title("🐉 HSEQ Academy: Camino a Shenlong")
+st.title("🐉 PREVELINDO: Obten las 3 esferas")
 st.sidebar.subheader(f"Esferas: {' '.join(st.session_state.esferas)}")
 st.sidebar.write(f"Vidas: {'❤️' * st.session_state.vidas}")
 
