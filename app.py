@@ -2,7 +2,7 @@ import streamlit as st
 import time
 import random
 
-st.set_page_config(page_title="HSEQ Academy 4.0", page_icon="🐉", layout="centered")
+st.set_page_config(page_title="PREVELINGO", page_icon="🐉", layout="centered")
 
 # --- 1. GESTIÓN DEL ESTADO ---
 if 'idx' not in st.session_state: st.session_state.idx = 0 
