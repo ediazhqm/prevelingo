@@ -10,7 +10,6 @@ if 'vidas' not in st.session_state: st.session_state.vidas = 3
 if 'esferas' not in st.session_state: st.session_state.esferas = []
 
 # --- 2. BASE DE DATOS ---
-# Cada entrada tiene la respuesta correcta y una lista de opciones que barajaremos
 preguntas = [
     {"pregunta": "¿Qué caracteriza la labor de un auditor según la normativa?", "opciones": ["Es independiente e íntegra", "Busca sancionar al personal", "Es una actividad administrativa"], "correcta": "Es independiente e íntegra"},
     {"pregunta": "¿Qué resulta al comparar una evidencia contra un criterio?", "opciones": ["Un Hallazgo / No Conformidad", "Una sanción económica", "Un reporte de gastos"], "correcta": "Un Hallazgo / No Conformidad"},
@@ -23,38 +22,39 @@ preguntas = [
     {"pregunta": "¿Qué sigue tras la ejecución de una inspección?", "opciones": ["Establecer y seguir planes de acción", "Archivar sin revisar", "Ignorar las desviaciones"], "correcta": "Establecer y seguir planes de acción"}
 ]
 
-# --- 3. LÓGICA DE FLUJO ---
+# --- 3. LÓGICA DE INTERFAZ ---
 st.title("🐉 HSEQ Academy: Camino a Shenlong")
 st.sidebar.subheader(f"Esferas: {' '.join(st.session_state.esferas)}")
 st.sidebar.write(f"Vidas: {'❤️' * st.session_state.vidas}")
 
-# Verificar si el juego terminó
+# --- PANTALLA DE VICTORIA (Prioridad máxima) ---
 if st.session_state.idx >= len(preguntas):
     st.balloons()
     st.success("¡FELICIDADES! Has reunido las 3 esferas.")
-    st.image("https://media.giphy.com/media/l41lTjJp8whYyG2uQ/giphy.gif")
-    st.header("¡Apareció Shenlong! Has completado el entrenamiento.")
+    # Usamos un contenedor para asegurar que la imagen se renderice
+    st.image("https://media.giphy.com/media/l41lTjJp8whYyG2uQ/giphy.gif", caption="¡Shenlong ha aparecido!")
+    st.header("Has completado el entrenamiento de Seguridad 4.0")
+    
     if st.button("Reiniciar camino"):
         st.session_state.idx = 0
         st.session_state.esferas = []
         st.session_state.vidas = 3
         st.rerun()
 
+# --- MODO JUEGO ---
 else:
     q = preguntas[st.session_state.idx]
     
-    # Crear opciones aleatorias al cargar la pregunta
-    if f"opciones_barajadas_{st.session_state.idx}" not in st.session_state:
+    # Barajar opciones solo al entrar a la pregunta
+    if f"ops_{st.session_state.idx}" not in st.session_state:
         opts = q['opciones'][:]
         random.shuffle(opts)
-        st.session_state[f"opciones_barajadas_{st.session_state.idx}"] = opts
-    
-    opts = st.session_state[f"opciones_barajadas_{st.session_state.idx}"]
+        st.session_state[f"ops_{st.session_state.idx}"] = opts
     
     st.subheader(f"Pregunta {st.session_state.idx + 1} de 9")
     st.write(f"**{q['pregunta']}**")
     
-    opcion = st.radio("Elige:", opts, key=f"q_{st.session_state.idx}")
+    opcion = st.radio("Elige una opción:", st.session_state[f"ops_{st.session_state.idx}"], key=f"q_{st.session_state.idx}")
     
     if st.button("Validar Respuesta"):
         if opcion == q['correcta']:
@@ -62,7 +62,7 @@ else:
             if (st.session_state.idx + 1) % 3 == 0:
                 st.session_state.esferas.append("🟠")
             st.session_state.idx += 1
-            time.sleep(0.5)
+            time.sleep(1)
             st.rerun()
         else:
             st.session_state.vidas -= 1
