@@ -17,7 +17,7 @@ preguntas = [
     {"pregunta": "¿Cómo son usualmente las visitas de fiscalización?", "opciones": ["Inopinadas", "Programadas con meses de aviso"], "correcta": "Inopinadas"},
     {"pregunta": "¿Qué verifica la fiscalización de SUNAFIL?", "opciones": ["El cumplimiento de la normatividad", "El horario de almuerzo"], "correcta": "El cumplimiento de la normatividad"},
     {"pregunta": "¿Cuál es la frecuencia del check-list pre-operacional?", "opciones": ["Diaria", "Trimestral"], "correcta": "Diaria"},
-    {"pregunta": "¿Qué metodología se usa para examinar situaciones críticas?", "opciones": ["Inspeccion sistemas Criticos", "Lluvia de ideas"], "correcta": "Observación Planeada (OPT)"},
+    {"pregunta": "¿Qué metodología se usa para examinar situaciones críticas?", "opciones": ["Observación Planeada (OPT)", "Lluvia de ideas"], "correcta": "Observación Planeada (OPT)"},
     {"pregunta": "¿Qué sigue tras la ejecución de una inspección?", "opciones": ["Establecer y seguir planes de acción", "Archivar sin revisar"], "correcta": "Establecer y seguir planes de acción"}
 ]
 
