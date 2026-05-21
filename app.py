@@ -46,4 +46,36 @@ if st.session_state.nivel_actual > 3:
 
 else:
     preguntas = base_preguntas[st.session_state.nivel_actual]
-    q = preguntas[st.session_state.
+    q = preguntas[st.session_state.pregunta_actual]
+    
+    titulos = ["Auditoría del SGSST", "Fiscalización (SUNAFIL)", "Inspecciones de Campo"]
+    st.subheader(f"Nivel {st.session_state.nivel_actual}: {titulos[st.session_state.nivel_actual - 1]}")
+    st.info(f"**Pregunta {st.session_state.pregunta_actual + 1}/3:** {q['escenario']}")
+    
+    opcion = st.radio("Selecciona una opción:", q['opciones'])
+    
+    if st.button("Validar Respuesta"):
+        if opcion == q['correcta']:
+            st.session_state.puntos += 10
+            st.success("¡Correcto! +10 pts")
+            time.sleep(1)
+            st.session_state.pregunta_actual += 1
+        else:
+            st.session_state.vidas -= 1
+            st.error(f"¡Incidente! {q['explicacion']}")
+            time.sleep(2)
+        
+        # Verificar si terminó el nivel
+        if st.session_state.pregunta_actual >= 3:
+            st.balloons()
+            st.session_state.esferas.append("🟠")
+            st.session_state.nivel_actual += 1
+            st.session_state.pregunta_actual = 0
+            st.rerun()
+        
+        if st.session_state.vidas <= 0:
+            st.error("💀 Sin vidas. Reiniciando camino...")
+            st.session_state.vidas = 3
+            st.session_state.nivel_actual = 1
+            st.session_state.esferas = []
+            st.rerun()
